@@ -1,4 +1,4 @@
-import imaplib, os, getpass, re
+import imaplib, os, getpass, re, email, email.utils, datetime, time, calendar
 
 uidre = re.compile(r"\d+\s+\(UID (\d+)\)$")
 def getUIDForMessage(n):
@@ -16,6 +16,12 @@ def downloadMessage(n, fname):
 	f = open(fname, 'w')
 	f.write(lst[0][1])
 	f.close()
+	message = email.message_from_string(lst[0][1])
+	dt_src = email.utils.parsedate_tz(message['date'])
+	utc_dt = datetime.datetime(*dt_src[:6])-datetime.timedelta(seconds= dt_src[-1])
+	dt = datetime.datetime.fromtimestamp(calendar.timegm(utc_dt.timetuple()))
+	message_ctime = time.mktime(dt.timetuple())
+	os.utime(fname, (message_ctime, message_ctime))
 
 
 filere = re.compile(r"(\d+).eml$")
