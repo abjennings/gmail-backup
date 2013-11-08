@@ -38,7 +38,11 @@ svr.login(raw_input("Gmail address: "), getpass.getpass("Gmail password: "))
 resp, [countstr] = svr.select("[Gmail]/All Mail", True)
 count = int(countstr)
 
-lastdownloaded = max(UIDFromFilename(f) for f in os.listdir('.'))
+existing_files = os.listdir(".")
+if existing_files:
+    lastdownloaded = max(UIDFromFilename(f) for f in existing_files)
+else:
+    lastdownloaded = 0
 
 
 # A simple binary search to see where we left off
