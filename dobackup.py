@@ -10,6 +10,7 @@ def getUIDForMessage(n):
 	
 
 def get_message_ctime(d):
+	orig_d = d
 	dt_src = email.utils.parsedate_tz(d)
 	if not dt_src:
 		return None
@@ -18,7 +19,12 @@ def get_message_ctime(d):
 		if " --" in d:
 			d = d.replace(" --", " -")
 			dt_src = email.utils.parsedate_tz(d)
-	dt = datetime.datetime(*dt_src[:6])
+	try:
+		dt = datetime.datetime(*dt_src[:6])
+	except Exception, e:
+		print e
+		print "orig date: %r, curr date: %r, dt_src: %r" % (orig_d, d, dt_src)
+		return None
 	if dt_src[-1]:
 		dt = dt-datetime.timedelta(seconds= dt_src[-1])
 	dt = datetime.datetime.fromtimestamp(calendar.timegm(dt.timetuple()))
