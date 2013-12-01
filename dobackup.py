@@ -56,13 +56,6 @@ def UIDFromFilename(fname):
 svr = imaplib.IMAP4_SSL('imap.gmail.com')
 
 def get_credentials():
-	for a in sys.argv[1:]:
-		if a.startswith("--creds="):
-			# --creds= is a file with TWO lines user\npwd
-			with open(a.split("=", 1)[-1]) as f:
-				user, pwd = f.read().strip().split("\n", 1)
-			return user, pwd
-	
 	user = raw_input("Gmail address: ")
 	pwd = getpass.getpass("Gmail password: ")
 	return user, pwd
