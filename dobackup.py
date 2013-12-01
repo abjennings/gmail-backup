@@ -58,12 +58,14 @@ def get_credentials():
 	pwd = getpass.getpass("Gmail password: ")
 	return user, pwd
 	
+
+GMAIL_FOLDER_NAME = "[Gmail]/All Mail"
 def do_backup():
 	svr = imaplib.IMAP4_SSL('imap.gmail.com')
 	user, pwd = get_credentials()
 	svr.login(user, pwd)
 
-	resp, [countstr] = svr.select("[Gmail]/All Mail", True)
+	resp, [countstr] = svr.select(GMAIL_FOLDER_NAME, True)
 	count = int(countstr)
 
 	existing_files = os.listdir(".")
