@@ -1,7 +1,7 @@
 import imaplib, os, getpass, re, email, email.utils, datetime, time, calendar, sys
 
 uidre = re.compile(r"\d+\s+\(UID (\d+)\)$")
-def getUIDForMessage(n):
+def getUIDForMessage(svr, n):
 	resp, lst = svr.fetch(n, 'UID')
 	m = uidre.match(lst[0])
 	if not m:
@@ -33,7 +33,7 @@ def get_message_ctime(d):
 	
 
 
-def downloadMessage(n, fname):
+def downloadMessage(svr, n, fname):
 	resp, lst = svr.fetch(n, '(RFC822)')
 	if resp!='OK':
 		raise Exception("Bad response: %s %s" % (resp, lst))
@@ -53,45 +53,48 @@ def UIDFromFilename(fname):
 		return int(m.group(1))
 
 
-svr = imaplib.IMAP4_SSL('imap.gmail.com')
-
 def get_credentials():
 	user = raw_input("Gmail address: ")
 	pwd = getpass.getpass("Gmail password: ")
 	return user, pwd
 	
-user, pwd = get_credentials()
-svr.login(user, pwd)
+def do_backup():
+	svr = imaplib.IMAP4_SSL('imap.gmail.com')
+	user, pwd = get_credentials()
+	svr.login(user, pwd)
 
-resp, [countstr] = svr.select("[Gmail]/All Mail", True)
-count = int(countstr)
+	resp, [countstr] = svr.select("[Gmail]/All Mail", True)
+	count = int(countstr)
 
-existing_files = os.listdir(".")
-if existing_files:
-	lastdownloaded = max(UIDFromFilename(f) for f in existing_files)
-else:
-	lastdownloaded = 0
-
-
-# A simple binary search to see where we left off
-gotten, ungotten = 0, count+1
-while ungotten-gotten>1:
-	attempt = (gotten+ungotten)/2
-	uid = getUIDForMessage(attempt)
-	if int(uid)<=lastdownloaded:
-		print "Finding starting point: %d/%d (UID: %s) too low" % (attempt, count, uid)
-		gotten = attempt
+	existing_files = os.listdir(".")
+	if existing_files:
+		lastdownloaded = max(UIDFromFilename(f) for f in existing_files)
 	else:
-		print "Finding starting point: %d/%d (UID: %s) too high" % (attempt, count, uid)
-		ungotten = attempt
+		lastdownloaded = 0
 
 
-# The download loop
-for i in range(ungotten, count+1):
-	uid = getUIDForMessage(i)
-	print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-	downloadMessage(i, uid+'.eml')
+	# A simple binary search to see where we left off
+	gotten, ungotten = 0, count+1
+	while ungotten-gotten>1:
+		attempt = (gotten+ungotten)/2
+		uid = getUIDForMessage(svr, attempt)
+		if int(uid)<=lastdownloaded:
+			print "Finding starting point: %d/%d (UID: %s) too low" % (attempt, count, uid)
+			gotten = attempt
+		else:
+			print "Finding starting point: %d/%d (UID: %s) too high" % (attempt, count, uid)
+			ungotten = attempt
 
 
-svr.close()
-svr.logout()
+	# The download loop
+	for i in range(ungotten, count+1):
+		uid = getUIDForMessage(svr, i)
+		print "Downloading %d/%d (UID: %s)" % (i, count, uid)
+		downloadMessage(svr, i, uid+'.eml')
+
+
+	svr.close()
+	svr.logout()
+
+if __name__=="__main__":
+	do_backup()
