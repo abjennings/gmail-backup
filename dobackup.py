@@ -49,10 +49,7 @@ def do_backup():
     count = int(countstr)
 
     existing_files = os.listdir(".")
-    if existing_files:
-        lastdownloaded = max(UIDFromFilename(f) for f in existing_files)
-    else:
-        lastdownloaded = 0
+    lastdownloaded = max(UIDFromFilename(f) for f in existing_files) if existing_files else 0
 
     # A simple binary search to see where we left off
     gotten, ungotten = 0, count+1
