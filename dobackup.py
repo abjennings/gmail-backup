@@ -4,12 +4,6 @@ import imaplib
 import os
 import getpass
 import re
-import email
-import email.utils
-import datetime
-import time
-import calendar
-import sys
 
 
 UID_RE = re.compile(r"\d+\s+\(UID (\d+)\)$")
@@ -25,29 +19,6 @@ def getUIDForMessage(svr, n):
     return m.group(1)
 
 
-def get_message_ctime(d):
-    orig_d = d
-    dt_src = email.utils.parsedate_tz(d)
-    if not dt_src:
-        return None
-    if not dt_src[-1]:
-        # TZ INFO IS MESSY
-        if " --" in d:
-            d = d.replace(" --", " -")
-            dt_src = email.utils.parsedate_tz(d)
-    try:
-        dt = datetime.datetime(*dt_src[:6])
-    except Exception, e:
-        print e
-        print "orig date: %r, curr date: %r, dt_src: %r" % (orig_d, d, dt_src)
-        return None
-    if dt_src[-1]:
-        dt = dt-datetime.timedelta(seconds=dt_src[-1])
-    dt = datetime.datetime.fromtimestamp(calendar.timegm(dt.timetuple()))
-    message_ctime = time.mktime(dt.timetuple())
-    return message_ctime
-
-
 def downloadMessage(svr, n, fname):
     resp, lst = svr.fetch(n, '(RFC822)')
     if resp != 'OK':
@@ -55,10 +26,6 @@ def downloadMessage(svr, n, fname):
     f = open(fname, 'w')
     f.write(lst[0][1])
     f.close()
-    message = email.message_from_string(lst[0][1])
-    message_ctime = get_message_ctime(message['date'])
-    if message_ctime:
-        os.utime(fname, (message_ctime, message_ctime))
 
 
 def UIDFromFilename(fname):
