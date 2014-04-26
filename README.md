@@ -1,8 +1,8 @@
-gmail-backup
-------------
+**Gmail-Backup**
+===================
 A simple Python script to download all your mail from Gmail to your local hard drive.
 
-Introduction
+**Introduction**
 ------------
 I love Gmail.  But sometimes I worry that all my emails are stored on Google's servers and if they ever
 lost them, then I would be hurting in a bad way.  And it would only be my own fault because I had never
