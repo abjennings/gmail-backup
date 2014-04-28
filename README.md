@@ -1,9 +1,9 @@
-gmail-backup
-------------
+**Gmail-Backup**
+===================
 A simple Python script to download all your mail from Gmail to your local hard drive.
 
-Introduction
-------------
+**Introduction**
+--------------
 I love Gmail.  But sometimes I worry that all my emails are stored on Google's servers and if they ever
 lost them, then I would be hurting in a bad way.  And it would only be my own fault because I had never
 backed them up anywhere.
@@ -16,13 +16,13 @@ whether it's storing them in an efficient format, or building indexes it doesn't
 really want it to store my Gmail password in some obfuscated format that other programs might be able
 to get access to.
 
-Notes
------
+**Notes**
+---------
 1. Make sure IMAP is enabled in your Gmail settings.
 
-2. cd into an empty directory where you want your emails downloaded.
+2. `cd` into an empty directory where you want your emails downloaded.
 
-2. Run "python path-to-gmail-backup/dobackup.py" and put in your Gmail address and password when prompted.
+2. Run ```python path-to-gmail-backup/dobackup.py``` and put in your Gmail address and password when prompted.
 
 3. Your emails will be downloaded to the current directory and named 1.eml, 2.eml, etc.
 
@@ -40,6 +40,6 @@ attachments.
 your data.  However, it does allow you to do things like sort by file size so you can see which emails
 to delete if you want to reclaim space in Gmail.
 
-Would be nice to add
+**Would be nice to add**
 --------------------
-Log in to Gmail with OAuth instead of Gmail password?
+ - Log in to Gmail with OAuth instead of Gmail password?
