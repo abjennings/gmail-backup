@@ -7,7 +7,7 @@ import re
 
 UID_RE = re.compile(r"\d+\s+\(UID (\d+)\)$")
 FILE_RE = re.compile(r"(\d+).eml$")
-GMAIL_FOLDER_NAME = "[Gmail]/All"
+GMAIL_FOLDER_NAME = "[Gmail]/All Mail"
 
 
 def getUIDForMessage(svr, n):
