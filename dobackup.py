@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import imaplib
 import os
 import getpass
@@ -8,14 +7,15 @@ import re
 
 UID_RE = re.compile(r"\d+\s+\(UID (\d+)\)$")
 FILE_RE = re.compile(r"(\d+).eml$")
-GMAIL_FOLDER_NAME = "[Gmail]/All Mail"
+GMAIL_FOLDER_NAME = "[Gmail]/All"
 
 
 def getUIDForMessage(svr, n):
     resp, lst = svr.fetch(n, 'UID')
     m = UID_RE.match(lst[0])
     if not m:
-        raise Exception("Internal error parsing UID response: %s %s.  Please try again" % (resp, lst))
+        raise Exception(
+            "Internal error parsing UID response: %s %s.  Please try again" % (resp, lst))
     return m.group(1)
 
 
@@ -49,12 +49,13 @@ def do_backup():
     count = int(countstr)
 
     existing_files = os.listdir(".")
-    lastdownloaded = max(UIDFromFilename(f) for f in existing_files) if existing_files else 0
+    lastdownloaded = max(UIDFromFilename(f)
+                         for f in existing_files) if existing_files else 0
 
     # A simple binary search to see where we left off
-    gotten, ungotten = 0, count+1
-    while (ungotten-gotten) > 1:
-        attempt = (gotten+ungotten)/2
+    gotten, ungotten = 0, count + 1
+    while (ungotten - gotten) > 1:
+        attempt = (gotten + ungotten) / 2
         uid = getUIDForMessage(svr, attempt)
         if int(uid) <= lastdownloaded:
             print "Finding starting point: %d/%d (UID: %s) too low" % (attempt, count, uid)
@@ -64,10 +65,10 @@ def do_backup():
             ungotten = attempt
 
     # The download loop
-    for i in range(ungotten, count+1):
+    for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
         print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        downloadMessage(svr, i, uid+'.eml')
+        downloadMessage(svr, i, uid + '.eml')
 
     svr.close()
     svr.logout()

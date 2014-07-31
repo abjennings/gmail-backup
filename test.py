@@ -6,7 +6,7 @@ if sys.argv[1:]:
 else:
     creds_file = None
 _saved_get_creds = dobackup.get_credentials
-    
+
 
 def test_get_credentials():
     if creds_file:
