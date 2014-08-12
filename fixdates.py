@@ -12,6 +12,7 @@ import calendar
 FILE_RE = re.compile(r"(\d+).eml$")
 LAST_DATE_FIXED_FILENAME = "last_email_fixed.dat"
 
+
 def get_message_ctime(d):
     orig_d = d
     dt_src = email.utils.parsedate_tz(d)
@@ -29,7 +30,7 @@ def get_message_ctime(d):
         print "orig date: %r, curr date: %r, dt_src: %r" % (orig_d, d, dt_src)
         return None
     if dt_src[-1]:
-        dt = dt-datetime.timedelta(seconds=dt_src[-1])
+        dt = dt - datetime.timedelta(seconds=dt_src[-1])
     dt = datetime.datetime.fromtimestamp(calendar.timegm(dt.timetuple()))
     message_ctime = time.mktime(dt.timetuple())
     return message_ctime
@@ -52,9 +53,9 @@ for fname in os.listdir("."):
 
 
 EMAIL_NUMBERS.sort()
-for i,file_int in enumerate(EMAIL_NUMBERS):
-    fname = str(file_int)+".eml"
-    print "(%d of %d) %s" % (i+1, len(EMAIL_NUMBERS), fname)
+for i, file_int in enumerate(EMAIL_NUMBERS):
+    fname = str(file_int) + ".eml"
+    print "(%d of %d) %s" % (i + 1, len(EMAIL_NUMBERS), fname)
 
     with open(fname) as f:
         file_contents = f.read()
