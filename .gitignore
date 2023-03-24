@@ -1,5 +1,5 @@
 *.eml
-
+backup/
 /TEST_CREDS.TXT
-
+.idea/
 *.pyc

@@ -7,7 +7,33 @@ import re
 
 UID_RE = re.compile(r"\d+\s+\(UID (\d+)\)$")
 FILE_RE = re.compile(r"(\d+).eml$")
-GMAIL_FOLDER_NAME = "[Gmail]/All Mail"
+
+
+def set_email_server():
+
+    print("Hi, Select from the list of Available Email clients below: ")
+    while True:
+        try:
+            email_choice = int(raw_input("1. Gmail\n2. Amazon Work Mail\nEnter Choice: "))
+        except ValueError:
+            print"That is an invalid input, try again"
+            continue
+        if email_choice == 1:
+            email_server = 'imap.gmail.com'
+            options = ['INBOX', '[Gmail]/All Mail', '[Gmail]/DRAFTS', '[Gmail]/Sent Email']
+            break
+        elif email_choice == 2:
+
+            print('Please enter the IMAP server Address of your amazon imap server')
+            email_server = raw_input("leave blank for default ('imap.mail.us-west-2.awsapps.com'): ")
+            email_server = 'imap.mail.us-west-2.awsapps.com' if email_server == '' else email_server
+            options = ['INBOX', 'Sent Items', 'Drafts']
+            break
+        else:
+            print('That is an invalid response, please try again')
+            continue
+
+    return email_server, options
 
 
 def getUIDForMessage(svr, n):
@@ -19,11 +45,14 @@ def getUIDForMessage(svr, n):
     return m.group(1)
 
 
-def downloadMessage(svr, n, fname):
+def download_message(svr, n, dirpath, basename):
     resp, lst = svr.fetch(n, '(RFC822)')
     if resp != 'OK':
         raise Exception("Bad response: %s %s" % (resp, lst))
-    f = open(fname, 'w')
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+    fpath = os.path.join(dirpath, basename)
+    f = open(fpath, 'w+')
     f.write(lst[0][1])
     f.close()
 
@@ -35,18 +64,50 @@ def UIDFromFilename(fname):
 
 
 def get_credentials():
-    user = raw_input("Gmail address: ")
-    pwd = getpass.getpass("Gmail password: ")
+    user = raw_input("Email address: ")
+    pwd = getpass.getpass("Email password: ")
     return user, pwd
 
 
-def do_backup():
-    svr = imaplib.IMAP4_SSL('imap.gmail.com')
-    user, pwd = get_credentials()
-    svr.login(user, pwd)
+def get_folder_to_backup(options):
+    max_opt = len(options)
+    while True:
+        try:
 
-    resp, [countstr] = svr.select(GMAIL_FOLDER_NAME, True)
-    count = int(countstr)
+            print("select folder you want to backup...")
+            for i in range(1, max_opt + 1):
+                print('{} -> {}'.format(i, options[i - 1]))
+
+            choice = int(raw_input("choice: "))
+        except ValueError:
+            print"That is an invalid input, try again"
+            continue
+        if choice not in range(1, max_opt + 1):
+            print('That is an invalid response, please try again')
+            continue
+        else:
+            folder_name = options[choice - 1]  # selecting folder from options list
+            break
+
+    return folder_name
+
+
+def do_backup():
+
+    email_server, options = set_email_server()
+    svr = imaplib.IMAP4_SSL(email_server, 993)  # default imap port 993
+    user, pwd = get_credentials()
+    resp = svr.login(user, pwd)
+    resp = resp[0]
+    if resp == 'OK':
+        print('Login successful')
+    else:
+        print('There is a fatal error somewhere')
+
+    email_folder_name = get_folder_to_backup(options)
+
+    resp, countstr = svr.select(email_folder_name, True)
+    count = int(countstr[0])
 
     existing_files = os.listdir(".")
     lastdownloaded = max(UIDFromFilename(f)
@@ -67,11 +128,15 @@ def do_backup():
     # The download loop
     for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
-        print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        downloadMessage(svr, i, uid + '.eml')
+        basename = uid+'.eml'
+
+        dir_path = os.path.join('backup', user, email_folder_name)
+        print "Downloading %d/%d (UID: %s)" % (i, count, basename)
+        download_message(svr, i, dir_path, basename)
 
     svr.close()
     svr.logout()
+
 
 if __name__ == "__main__":
     do_backup()
