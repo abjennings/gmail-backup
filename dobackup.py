@@ -35,8 +35,8 @@ def UIDFromFilename(fname):
 
 
 def get_credentials():
-    user = raw_input("Gmail address: ")
-    pwd = getpass.getpass("Gmail password: ")
+    user = os.environ.get("DOBACKUP_GMAIL_APP_USER", None) or raw_input("Gmail address: ")
+    pwd = os.environ.get("DOBACKUP_GMAIL_APP_PWD", None) or getpass.getpass("Gmail password: ")
     return user, pwd
 
 

@@ -24,6 +24,8 @@ to get access to.
 
 2. Run ```python path-to-gmail-backup/dobackup.py``` and put in your Gmail address and password when prompted.
 
+2. Set env vars `DOBACKUP_GMAIL_APP_USER` and `DOBACKUP_GMAIL_APP_PWD` if you want to avoid manual input.
+
 3. Your emails will be downloaded to the current directory and named 1.eml, 2.eml, etc.
 
 4. Numbering is not necessarily sequential.  The file is named after the message's "unique id", which,
