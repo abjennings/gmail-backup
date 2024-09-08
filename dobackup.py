@@ -39,13 +39,20 @@ def get_credentials():
     pwd = os.environ.get("DOBACKUP_GMAIL_APP_PWD", None) or getpass.getpass("Gmail password: ")
     return user, pwd
 
+def gmail_folder():
+    return os.environ.get("DOBACKUP_GMAIL_LABEL", GMAIL_FOLDER_NAME) 
+
+def save_folder_path():
+    folder = os.environ.get("DOBACKUP_SAVE_FOLDER", "") # i.e. "./"
+    os.makedirs(folder, exist_ok=True)
+    return folder
 
 def do_backup():
     svr = imaplib.IMAP4_SSL('imap.gmail.com')
     user, pwd = get_credentials()
     svr.login(user, pwd)
 
-    resp, [countstr] = svr.select(GMAIL_FOLDER_NAME, True)
+    resp, [countstr] = svr.select(gmail_folder(), True)
     count = int(countstr)
 
     existing_files = os.listdir(".")
@@ -68,7 +75,8 @@ def do_backup():
     for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
         print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        downloadMessage(svr, i, uid + '.eml')
+        filepath = save_folder_path() + uid + '.eml'
+        downloadMessage(svr, i, filepath)
 
     svr.close()
     svr.logout()
