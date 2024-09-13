@@ -43,11 +43,18 @@ def gmail_folder():
     return os.environ.get("DOBACKUP_GMAIL_LABEL", GMAIL_FOLDER_NAME) 
 
 def save_folder_path():
-    folder = os.environ.get("DOBACKUP_SAVE_FOLDER", "") # i.e. "./"
-    os.makedirs(folder, exist_ok=True)
+    folder = os.environ.get("DOBACKUP_SAVE_FOLDER", '.') # i.e. "./"
+    if (not folder or (folder and folder == '')):
+        raise ValueError("target folder missing")
+    if os.path.isfile(folder):
+        raise ValueError("a file exists at your target path")
+
+    if not os.path.exists(folder):
+        os.makedirs(folder)
     return folder
 
 def do_backup():
+    target_folder = save_folder_path()
     svr = imaplib.IMAP4_SSL('imap.gmail.com')
     user, pwd = get_credentials()
     svr.login(user, pwd)
@@ -75,7 +82,7 @@ def do_backup():
     for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
         print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        filepath = save_folder_path() + uid + '.eml'
+        filepath = ios.path.join(target_folder, uid + '.eml')
         downloadMessage(svr, i, filepath)
 
     svr.close()
