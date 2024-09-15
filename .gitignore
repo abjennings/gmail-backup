@@ -3,3 +3,4 @@
 /TEST_CREDS.TXT
 
 *.pyc
+.DS_Store

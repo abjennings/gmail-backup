@@ -35,17 +35,31 @@ def UIDFromFilename(fname):
 
 
 def get_credentials():
-    user = raw_input("Gmail address: ")
-    pwd = getpass.getpass("Gmail password: ")
+    user = os.environ.get("DOBACKUP_GMAIL_APP_USER", None) or raw_input("Gmail address: ")
+    pwd = os.environ.get("DOBACKUP_GMAIL_APP_PWD", None) or getpass.getpass("Gmail password: ")
     return user, pwd
 
+def gmail_folder():
+    return os.environ.get("DOBACKUP_GMAIL_LABEL", GMAIL_FOLDER_NAME) 
+
+def save_folder_path():
+    folder = os.environ.get("DOBACKUP_SAVE_FOLDER", '.') # i.e. "./"
+    if not folder:
+        raise ValueError("target folder missing")
+    if os.path.isfile(folder):
+        raise ValueError("a file exists at your target path")
+
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    return folder
 
 def do_backup():
+    target_folder = save_folder_path()
     svr = imaplib.IMAP4_SSL('imap.gmail.com')
     user, pwd = get_credentials()
     svr.login(user, pwd)
 
-    resp, [countstr] = svr.select(GMAIL_FOLDER_NAME, True)
+    resp, [countstr] = svr.select(gmail_folder(), True)
     count = int(countstr)
 
     existing_files = os.listdir(".")
@@ -68,7 +82,8 @@ def do_backup():
     for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
         print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        downloadMessage(svr, i, uid + '.eml')
+        filepath = os.path.join(target_folder, uid + '.eml')
+        downloadMessage(svr, i, filepath)
 
     svr.close()
     svr.logout()
