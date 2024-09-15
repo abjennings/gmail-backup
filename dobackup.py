@@ -44,7 +44,7 @@ def gmail_folder():
 
 def save_folder_path():
     folder = os.environ.get("DOBACKUP_SAVE_FOLDER", '.') # i.e. "./"
-    if (not folder or (folder and folder == '')):
+    if not folder:
         raise ValueError("target folder missing")
     if os.path.isfile(folder):
         raise ValueError("a file exists at your target path")
@@ -82,7 +82,7 @@ def do_backup():
     for i in range(ungotten, count + 1):
         uid = getUIDForMessage(svr, i)
         print "Downloading %d/%d (UID: %s)" % (i, count, uid)
-        filepath = ios.path.join(target_folder, uid + '.eml')
+        filepath = os.path.join(target_folder, uid + '.eml')
         downloadMessage(svr, i, filepath)
 
     svr.close()
