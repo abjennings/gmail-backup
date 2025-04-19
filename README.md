@@ -1,6 +1,6 @@
 **Gmail-Backup**
 ===================
-A simple Python script to download all your mail from Gmail to your local hard drive.
+A simple Python 2 script to download all your mail from Gmail to your local hard drive.
 
 **Introduction**
 --------------
@@ -20,27 +20,29 @@ to get access to.
 ---------
 1. Make sure IMAP is enabled in your Gmail settings.
 
-2. `cd` into an empty directory where you want your emails downloaded.
+2. Create an App Password for your Gmail account. This 16 character string is what you'll input as the script password.
 
-2. Run ```python path-to-gmail-backup/dobackup.py``` and put in your Gmail address and password when prompted.
+3. `cd` into an empty directory where you want your emails downloaded.
 
-    2. Set env vars `DOBACKUP_GMAIL_APP_USER` and `DOBACKUP_GMAIL_APP_PWD` if you want to avoid manual input.
+4. Run ```python path-to-gmail-backup/dobackup.py``` and put in your Gmail address and password when prompted.
+
+    1. Set env vars `DOBACKUP_GMAIL_APP_USER` and `DOBACKUP_GMAIL_APP_PWD` if you want to avoid manual input.
 
     2. Set env vars `DOBACKUP_GMAIL_LABEL` and `DOBACKUP_SAVE_FOLDER` if you want to target subsets of your email account, and save them someplace specific.
 
-3. Your emails will be downloaded to the current directory and named 1.eml, 2.eml, etc.
+5. Your emails will be downloaded to the current directory and named 1.eml, 2.eml, etc.
 
-4. Numbering is not necessarily sequential.  The file is named after the message's "unique id", which,
+6. Numbering is not necessarily sequential.  The file is named after the message's "unique id", which,
 as part of the IMAP protocol, is assigned by Gmail and should stay the same forever.  They look to be
 sequential but with numbers missing for messages that got deleted.
 
-5. You can stop the process with a Ctrl+C if you need to.  If you stop the process or it errors out,
+7. You can stop the process with a Ctrl+C if you need to.  If you stop the process or it errors out,
 when you run it again it will pick up where it left off.
 
-6. Attachments are not extracted into separate files, they're just embedded in the eml file as MIME
+8. Attachments are not extracted into separate files, they're just embedded in the eml file as MIME
 attachments.
 
-7. This is not intended to be a complete email client, just a simple failsafe in case Gmail ever loses
+9. This is not intended to be a complete email client, just a simple failsafe in case Gmail ever loses
 your data.  However, it does allow you to do things like sort by file size so you can see which emails
 to delete if you want to reclaim space in Gmail.
 
